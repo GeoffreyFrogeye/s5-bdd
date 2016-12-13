@@ -3,23 +3,47 @@ require('header.inc.php');
 
 $salle = $_GET['salle'];
 
-?>
-<h2>Salle <?php echo $salle; ?></h2>
-<?php
 
 // Récupérons la liste des palettes dans la salle
 $sql = "SELECT * FROM VueSalle WHERE lieu = '".pg_escape_string($salle)."'";
-$palettes = pg_exec($bdd, $sql);
-if (!$palettes) {
-    erreurBDD("Impossible de récupérer la liste des palettes");
+$produits = pg_exec($bdd, $sql);
+if (!$produits) {
+    erreurBDD("Impossible de récupérer la liste des produits");
 }
 
-while ($palette = pg_fetch_assoc($palettes)) {
+$dernierePalette = null;
+while ($produit = pg_fetch_assoc($produits)) {
+
+    // Si on est à la première lgine du tableau, on a pas encore
+    // affiché la salle qu'on a pas pu afficher plus tôt étant
+    // donné qu'on ne pouvait pas utiliser pg_fetch_* sans
+    // perdre un enregistrement
+    if ($dernierePalette === null) {
+?>
+    <h2>Salle <?php echo $produit['lieu']; ?> (<?php echo $produit['temperature']; ?>°C)</h2>
+<?php
+    }
+
+    // On exploite le fait que les vues soient triées
+    // par palette afin de pouvoir détecter le changement
+    // de palette et ainsi fermer le tableau précédent et
+    // en ouvrir un nouveau tout en ayant une seule palette
+    if ($produit['codepa'] != $dernierePalette) {
+
+        // Si on est pas au tout début, cela veut dire que
+        // ce n'est pas le premier tableau et donc qu'il faut
+        // fermer le tableau précédent
+        if ($dernierePalette !== null) {
+?>
+</table>
+<?php
+
+        }
 
 ?>
-<h3>Palette <?php echo $palette['codepa']; ?></h3>
+<h3>produit <?php echo $produit['codepa']; ?></h3>
 <?php
-// Récupérons la liste des produits sur la palette
+// Récupérons la liste des produits sur la produit
 
 ?>
 <table class="table table-striped">
@@ -31,12 +55,10 @@ while ($palette = pg_fetch_assoc($palettes)) {
         <th>Quantité</th>
     </tr>
 <?php
-// Récupérons la liste des produits sur la palette
-$sql2 = "SELECT * FROM VuePalette WHERE codepa = '".pg_escape_string($palette['codepa'])."'";
-$produits = pg_exec($bdd, $sql2);
-while ($produit = pg_fetch_assoc($produits)) {
+    }
+// Récupérons la liste des produits sur la produit
 ?>
-    <tr>
+    <tr<?php if ($produit['horsborne'] == 't') { echo ' class="danger"'; }?>>
         <td><?php echo $produit['codepr']; ?></td>
         <td><?php echo $produit['libelle']; ?></td>
         <td><?php echo $produit['temperaturemin']; ?>°C</td>
@@ -44,10 +66,10 @@ while ($produit = pg_fetch_assoc($produits)) {
         <td><?php echo $produit['quantite']; ?> unité<?php if ($produit['quantite'] >= 2) { ?>s<?php } ?></td>
     </tr>
 <?php
+    $dernierePalette = $produit['codepa'];
 }
 ?>
 </table>
 <?php
-}
 include('footer.inc.php');
 ?>

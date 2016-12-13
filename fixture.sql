@@ -58,15 +58,14 @@ insert into Lot VALUES ('P4','pr2','157348');
 
 CREATE VIEW VueEntrepot AS SELECT
 numero, temperature, capacite FROM Salle
-ORDER BY temperature, capacite DESC;
+ORDER BY temperature ASC, capacite DESC;
 
-CREATE VIEW VueSalle AS SELECT
-codepa, lieu FROM Palette;
-
-CREATE VIEW VuePalette
-AS SELECT codepa, codepr, libelle, temperaturemin, temperaturemax, quantite
-FROM Palette, Produit, Lot
-WHERE codepa = support AND produit = codepr;
+CREATE VIEW VueSalle
+AS SELECT codepa, codepr, libelle, temperaturemin, temperaturemax, quantite, lieu, temperature,
+CAST(CASE WHEN (temperaturemin >= temperature OR temperaturemax <= temperature) THEN TRUE ELSE FALSE END AS BOOLEAN) horsborne
+FROM Palette, Produit, Lot, Salle
+WHERE codepa = support AND produit = codepr AND numero = lieu
+ORDER BY codepa ASC;
 
 /*Lignes de la table incorrectes
 
