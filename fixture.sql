@@ -3,9 +3,9 @@ Création de base de donnée
 createdb BlasBontouxEntrepots
 */
 
-drop view if exists vueentrepot;
-drop view if exists vuesalle;
-drop view if exists vuepalette;
+drop view if exists VueEntrepot;
+drop view if exists VueSalle;
+drop view if exists VueDeplacement;
 drop table if exists Lot;
 drop table if exists Palette;
 drop table if exists Salle;
@@ -34,27 +34,30 @@ create table Lot
 
 /* Lignes de la table correctes */
 
-insert into Salle VALUES ('1', 1,20);
-insert into Salle VALUES ('2', 5,10);
-insert into Salle VALUES ('3', 15,22);
-insert into Salle VALUES ('4', 3,150);
+insert into Salle VALUES ('1', 1, 20);
+insert into Salle VALUES ('2', 5, 10);
+insert into Salle VALUES ('3', 15, 22);
+insert into Salle VALUES ('4', 3, 150);
+insert into Salle VALUES ('5', 2, 0);
 
 
 insert into Palette VALUES ('P1', NULL);
 insert into Palette VALUES ('P2', '3');
 insert into Palette VALUES ('P3', '3');
 insert into Palette VALUES ('P4', '1');
+insert into Palette VALUES ('P5', NULL);
 
-insert into Produit VALUES ('pr1','Algue',5,15);
-insert into Produit VALUES ('pr2','Chocolat',5,25);
-insert into Produit VALUES ('pr3','Pomme',-1,1);
-insert into Produit VALUES ('pr4','Kangourou',0,20);
+insert into Produit VALUES ('pr1', 'Algue', 5, 15);
+insert into Produit VALUES ('pr2', 'Chocolat', 5, 25);
+insert into Produit VALUES ('pr3', 'Pomme', -1, 1);
+insert into Produit VALUES ('pr4', 'Kangourou', 0, 20);
 
-insert into Lot VALUES ('P2','pr2','121');
-insert into Lot VALUES ('P2','pr4','15');
-insert into Lot VALUES ('P1','pr3','1');
-insert into Lot VALUES ('P3','pr4','10');
-insert into Lot VALUES ('P4','pr2','157348');
+insert into Lot VALUES ('P2', 'pr2', '121');
+insert into Lot VALUES ('P2', 'pr4', '15');
+insert into Lot VALUES ('P1', 'pr3', '1');
+insert into Lot VALUES ('P3', 'pr4', '10');
+insert into Lot VALUES ('P4', 'pr2', '157348');
+insert into Lot VALUES ('P5', 'pr2', '7');
 
 /* Service 1 :
  * On liste simplement les salles
@@ -76,10 +79,18 @@ ORDER BY temperature ASC, capacite DESC;
  * lieu pour pouvoir filtrer lors de l'affichage d'une page. Enfin, on crée
  * un booléan horsborne qui permet d'indiquer que la température de la salle
  * n'est pas dans l'intervalle de conservation d'un certain produit.
+ * On donne aussi la température pour pouvoir l'afficher
  */
 CREATE VIEW VueSalle
-AS SELECT codepa, codepr, libelle, temperaturemin, temperaturemax, quantite, lieu,
-CAST(CASE WHEN (temperaturemin >= temperature OR temperaturemax <= temperature) THEN TRUE ELSE FALSE END AS BOOLEAN) horsborne
+AS SELECT codepa, codepr, libelle, temperaturemin, temperaturemax, quantite, lieu, temperature,
+CAST(
+    CASE WHEN (temperaturemin >= temperature OR temperaturemax <= temperature)
+    THEN
+        TRUE
+    ELSE
+        FALSE
+    END AS BOOLEAN
+) horsborne
 FROM Palette, Produit, Lot, Salle
 WHERE codepa = support AND produit = codepr AND numero = lieu
 ORDER BY codepa ASC;
@@ -87,11 +98,34 @@ ORDER BY codepa ASC;
 /* Service 3
  * On crée la liste des combinaisons Salle / Palette
  * (dont on retourne le code pour pouvoir filtrer)
- * où la palette n'est pas associée à une salle
- * et la salle n'est pas pleine.
+ * où la palette n'est pas associée à une salle,
+ * la salle n'est pas pleine et les produits sur
+ * la palette sont compatibles avec la température
+ * de la salle. De même on veut grouper les palettes
+ * mais pour que ce soit dans l'ordre alphanumérique
+ * et que l'ordre des palettes soit le même pour
+ * chaque rechargement de la vue on utilise ORDER BY
+ * plutôt que GROUP BY.
  */
-CREATE VIEW Deplacements AS
-SELECT 
+CREATE VIEW VueDeplacement AS
+SELECT numero, codepa
+FROM Salle, Palette
+WHERE
+    lieu IS NULL
+    AND capacite > ( /* Récupération du nombre de palettes déjà présentes dans la salle  */
+        SELECT COUNT(*)
+        FROM Palette
+        WHERE lieu = numero
+    ) AND temperature <= ALL ( /* Récupération des températures maximum de tout ce qu'il y a dans la palette */
+        SELECT temperaturemax
+        FROM Produit, Lot
+        WHERE support = codepa AND produit = codepr
+    ) AND temperature >= ALL ( /* Récupération des températures minimum de tout ce qu'il y a dans la palette */
+        SELECT temperaturemin
+        FROM Produit, Lot
+        WHERE support = codepa AND produit = codepr
+    )
+ORDER BY codepa ASC;
 
 /*Lignes de la table incorrectes
 

@@ -41,9 +41,8 @@ while ($produit = pg_fetch_assoc($produits)) {
         }
 
 ?>
-<h3>produit <?php echo $produit['codepa']; ?></h3>
+<h3>Palette <?php echo $produit['codepa']; ?></h3>
 <?php
-// Récupérons la liste des produits sur la produit
 
 ?>
 <table class="table table-striped">
@@ -56,7 +55,6 @@ while ($produit = pg_fetch_assoc($produits)) {
     </tr>
 <?php
     }
-// Récupérons la liste des produits sur la produit
 ?>
     <tr<?php if ($produit['horsborne'] == 't') { echo ' class="danger"'; }?>>
         <td><?php echo $produit['codepr']; ?></td>

@@ -1,3 +1,12 @@
+<?php
+// Ce fichier, qui sera inclus dans toutes les autres pages, sert à plusieurs fonctions
+// La première est d'écrire les en-têtes HTML qui sont les mêmes sur toutes les pages,
+// ainsi que le titre principal et le menu
+// Elle définit certains paramètres qui seront utiles pour toutes les pages
+// Elle fait de même avec certaines fonctions
+// Enfin, elle crée la variable $bdd qui est une ressource d'accès à la base de données
+// qui sera accessible par toutes les pages
+?>
 <!doctype html>
 <html>
 <head>
@@ -12,10 +21,9 @@
 <article class="container">
 <?php
 
-// Trucs utiles
+// Paramètres utiles
 ini_set('display_errors', 'on');
 error_reporting(E_ALL);
-include('config.php');
 
 // Liste des fonctions utiles
 function erreurBDD($message) {
@@ -27,6 +35,7 @@ function erreurBDD($message) {
 }
 
 // On se connecte
+include('config.php');
 $bdd = pg_connect("host=$machine user=$user password=$pwd dbname=$db");
 if (!$db) {
     erreurBDD("Impossible de se connecter à la base de données");
@@ -37,4 +46,5 @@ if (!$db) {
 <ul class="nav nav-pills">
     <li role="presentation"><a href="index.php">Accueil</a></li>
     <li role="presentation"><a href="entrepot.php">Entrepot</a></li>
+    <li role="presentation"><a href="deplacement.php">Palettes non-allouées</a></li>
 </ul>
