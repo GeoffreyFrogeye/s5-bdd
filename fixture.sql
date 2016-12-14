@@ -56,16 +56,42 @@ insert into Lot VALUES ('P1','pr3','1');
 insert into Lot VALUES ('P3','pr4','10');
 insert into Lot VALUES ('P4','pr2','157348');
 
+/* Service 1 :
+ * On liste simplement les salles
+ * de tout l'entrepot et on donne leur
+ * champs numero, temperature et capacité
+ */
 CREATE VIEW VueEntrepot AS SELECT
 numero, temperature, capacite FROM Salle
 ORDER BY temperature ASC, capacite DESC;
 
+/* Service 2
+ * On liste tous les lots, en donnant leur quantité et les
+ * informations sur le produit associé (temperaturemin, temperaturemax,
+ * codepr, libelle (ce n'était pas demandé mais c'est plus ludique)).
+ * On renvoie aussi pour chaque lot le code de la palette associée (codepa),
+ * champ selon lequel la requête est triée afin de pouvoir regrouper par palette
+ * sur l'application (on aurait pu utiliser GROUP BY, mais on voulait les trier
+ * aussi par esthétisme du coup GROUP BY n'est pas nécessaire). On retourne le
+ * lieu pour pouvoir filtrer lors de l'affichage d'une page. Enfin, on crée
+ * un booléan horsborne qui permet d'indiquer que la température de la salle
+ * n'est pas dans l'intervalle de conservation d'un certain produit.
+ */
 CREATE VIEW VueSalle
-AS SELECT codepa, codepr, libelle, temperaturemin, temperaturemax, quantite, lieu, temperature,
+AS SELECT codepa, codepr, libelle, temperaturemin, temperaturemax, quantite, lieu,
 CAST(CASE WHEN (temperaturemin >= temperature OR temperaturemax <= temperature) THEN TRUE ELSE FALSE END AS BOOLEAN) horsborne
 FROM Palette, Produit, Lot, Salle
 WHERE codepa = support AND produit = codepr AND numero = lieu
 ORDER BY codepa ASC;
+
+/* Service 3
+ * On crée la liste des combinaisons Salle / Palette
+ * (dont on retourne le code pour pouvoir filtrer)
+ * où la palette n'est pas associée à une salle
+ * et la salle n'est pas pleine.
+ */
+CREATE VIEW Deplacements AS
+SELECT 
 
 /*Lignes de la table incorrectes
 
