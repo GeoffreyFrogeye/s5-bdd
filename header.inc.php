@@ -28,7 +28,7 @@ error_reporting(E_ALL);
 // Liste des fonctions utiles
 function erreurBDD($message) {
 ?>
-    <div class="alert alert-danger" role="alert"><?php echo $mesage; ?> (<?php echo pg_last_error($db); ?>)</div>
+    <div class="alert alert-danger" role="alert"><?php echo $mesage; ?> (<?php echo pg_last_error($bdd); ?>)</div>
 <?php
     include('footer.php');
     die();

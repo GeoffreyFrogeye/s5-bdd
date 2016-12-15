@@ -42,9 +42,6 @@ while ($produit = pg_fetch_assoc($produits)) {
 
 ?>
 <h3>Palette <?php echo $produit['codepa']; ?></h3>
-<?php
-
-?>
 <table class="table table-striped">
     <tr>
         <th>Code produit</th>

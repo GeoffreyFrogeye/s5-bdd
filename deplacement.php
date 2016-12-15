@@ -3,8 +3,8 @@ require('header.inc.php');
 
 // Récupérons la liste des palettes dans la salle
 $sql = "SELECT * FROM VueDeplacement";
-$palettes = pg_exec($bdd, $sql);
-if (!$palettes) {
+$salles = pg_exec($bdd, $sql);
+if (!$salles) {
     erreurBDD("Impossible de récupérer la liste des palettes déplaceables");
 }
 
@@ -15,13 +15,13 @@ if (!$palettes) {
 <?php
 
 $dernierePalette = null;
-while ($palette = pg_fetch_assoc($palettes)) {
+while ($salle = pg_fetch_assoc($salles)) {
 
     // On exploite le fait que les vues soient triées
     // par palette afin de pouvoir détecter le changement
     // de palette et ainsi fermer la liste précédente et
     // en ouvrir une nouvelle tout en ayant une seule palette
-    if ($palette['codepa'] != $dernierePalette) {
+    if ($salle['codepa'] != $dernierePalette) {
 
         // Si on est pas au tout début, cela veut dire que
         // ce n'est pas le premier tableau et donc qu'il faut
@@ -34,21 +34,18 @@ while ($palette = pg_fetch_assoc($palettes)) {
         }
 
 ?>
-<h3>Palette <?php echo $palette['codepa']; ?></h3>
-<?php
-
-?>
+<h3>Palette <?php echo $salle['codepa']; ?></h3>
 <ul class="nav nav-pills nav-stacked">
 <?php
     }
 ?>
     <li>
-        <a href="deplacer.php?palette=<?php echo urlencode($palette['codepa']); ?>&salle=<?php echo urlencode($palette['numero']); ?>">
-            Entreposer dans la salle <?php echo $palette['numero']; ?>
+        <a href="deplacer.php?palette=<?php echo urlencode($salle['codepa']); ?>&salle=<?php echo urlencode($salle['numero']); ?>">
+            Entreposer dans la salle <?php echo $salle['numero']; ?>
         </a>
     </li>
 <?php
-    $dernierePalette = $palette['codepa'];
+    $dernierePalette = $salle['codepa'];
 }
 ?>
 </ul>
