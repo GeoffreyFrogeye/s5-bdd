@@ -14,7 +14,7 @@ if (!$produits) {
 $dernierePalette = null;
 while ($produit = pg_fetch_assoc($produits)) {
 
-    // Si on est à la première lgine du tableau, on a pas encore
+    // Si on est à la première ligne du tableau, on a pas encore
     // affiché la salle qu'on a pas pu afficher plus tôt étant
     // donné qu'on ne pouvait pas utiliser pg_fetch_* sans
     // perdre un enregistrement

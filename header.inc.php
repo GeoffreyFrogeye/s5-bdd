@@ -26,12 +26,17 @@ ini_set('display_errors', 'on');
 error_reporting(E_ALL);
 
 // Liste des fonctions utiles
-function erreurBDD($message) {
+function erreur($message) {
 ?>
-    <div class="alert alert-danger" role="alert"><?php echo $mesage; ?> (<?php echo pg_last_error($bdd); ?>)</div>
+    <div class="alert alert-danger" role="alert"><?php echo $message; ?></div>
 <?php
-    include('footer.php');
+    include('footer.inc.php');
     die();
+
+}
+
+function erreurBDD($message) {
+    erreur($message . ' ( ' . pg_last_error($bdd) . ')');
 }
 
 // On se connecte
