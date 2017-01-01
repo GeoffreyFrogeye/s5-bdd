@@ -63,8 +63,14 @@ while ($produit = pg_fetch_assoc($produits)) {
 <?php
     $dernierePalette = $produit['codepa'];
 }
+if ($dernierePalette) {
 ?>
 </table>
 <?php
+} else {
+?>
+<p>Cette salle est vide.</p>
+<?php
+}
 include('footer.inc.php');
 ?>

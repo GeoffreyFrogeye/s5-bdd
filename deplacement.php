@@ -47,8 +47,15 @@ while ($salle = pg_fetch_assoc($salles)) {
 <?php
     $dernierePalette = $salle['codepa'];
 }
+if ($dernierePalette) {
 ?>
 </ul>
 <?php
+} else {
+?>
+<p>Toutes les palettes sont allouées à une salle.</p>
+<div class="alert alert-info" role="alert"><strong>Astuce :</strong> Vous pouvez réinitialiser la BDD avec des valeurs par défaut depuis l'Accueil pour pouvoir tester l'affectation des salles à nouveau.</div>
+<?php
+}
 include('footer.inc.php');
 ?>
