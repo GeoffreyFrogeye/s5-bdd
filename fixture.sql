@@ -82,20 +82,6 @@ ORDER BY temperature ASC, capacite DESC;
  * n'est pas dans l'intervalle de conservation d'un certain produit.
  * On donne aussi la température pour pouvoir l'afficher
  */
-/* CREATE VIEW VueSalle
-AS SELECT codepa, codepr, libelle, temperaturemin, temperaturemax, quantite, lieu, temperature,
-CAST(
-    CASE WHEN (temperaturemin >= temperature OR temperaturemax <= temperature)
-    THEN
-        TRUE
-    ELSE
-        FALSE
-    END AS BOOLEAN
-) horsborne
-FROM Palette, Produit, Lot, Salle
-WHERE codepa = support AND produit = codepr AND numero = lieu
-ORDER BY codepa ASC; */
-
 CREATE VIEW VueSalle
 AS SELECT codepa, codepr, libelle, temperaturemin, temperaturemax, quantite, numero, temperature,
 CAST(
