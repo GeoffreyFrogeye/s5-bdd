@@ -39,6 +39,7 @@ insert into Salle VALUES ('2', 5, 10);
 insert into Salle VALUES ('3', 15, 22);
 insert into Salle VALUES ('4', 3, 150);
 insert into Salle VALUES ('5', 2, 0);
+insert into Salle VALUES ('6', 2, 0);
 
 
 insert into Palette VALUES ('P1', NULL);
@@ -81,7 +82,7 @@ ORDER BY temperature ASC, capacite DESC;
  * n'est pas dans l'intervalle de conservation d'un certain produit.
  * On donne aussi la température pour pouvoir l'afficher
  */
-CREATE VIEW VueSalle
+/* CREATE VIEW VueSalle
 AS SELECT codepa, codepr, libelle, temperaturemin, temperaturemax, quantite, lieu, temperature,
 CAST(
     CASE WHEN (temperaturemin >= temperature OR temperaturemax <= temperature)
@@ -93,6 +94,22 @@ CAST(
 ) horsborne
 FROM Palette, Produit, Lot, Salle
 WHERE codepa = support AND produit = codepr AND numero = lieu
+ORDER BY codepa ASC; */
+
+CREATE VIEW VueSalle
+AS SELECT codepa, codepr, libelle, temperaturemin, temperaturemax, quantite, numero, temperature,
+CAST(
+    CASE WHEN (temperaturemin >= temperature OR temperaturemax <= temperature)
+    THEN
+        TRUE
+    ELSE
+        FALSE
+    END AS BOOLEAN
+) horsborne
+FROM Salle
+LEFT JOIN Palette ON numero = lieu
+LEFT JOIN Lot ON codepa = support
+LEFT JOIN Produit ON produit = codepr
 ORDER BY codepa ASC;
 
 /* Service 3
